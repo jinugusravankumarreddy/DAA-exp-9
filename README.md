@@ -1,15 +1,18 @@
-# DAA Experiment 10: Quick Sort Comparison
+# DAA Experiment 9: Bin Packing Comparison
 
 ## File
 
-`quicksort_comparison_tkinter.py`
+`bin_packing_tkinter.py`
 
 ## Purpose
 
-This Tkinter application compares two Quick Sort variants:
+This Tkinter application compares three bin-packing algorithms:
 
-- Deterministic Quick Sort — always chooses the final element as pivot
-- Randomized Quick Sort — randomly chooses a pivot
+- First Fit (FF)
+- First Fit Decreasing (FFD)
+- Best Fit Decreasing (BFD)
+
+Each algorithm places items into bins without exceeding the chosen bin capacity.
 
 ## Requirement
 
@@ -18,28 +21,31 @@ This Tkinter application compares two Quick Sort variants:
 ## Run
 
 ```powershell
-python quicksort_comparison_tkinter.py
+python bin_packing_tkinter.py
 ```
 
 ## Input
 
-Enter 1 to 500 integers separated by commas, then click **Compare Sorts**.
+1. Enter positive item sizes separated by commas.
+2. Enter the bin capacity.
+3. Click **Compare Algorithms**.
 
 Example:
 
 ```text
-45, 12, 78, 3, 56, 23, 90, 34, 67, 8
+Items: 0.5, 0.7, 0.3, 0.9, 0.2, 0.6, 0.8, 0.4, 0.1, 0.5
+Capacity: 1.0
 ```
+
+Every item must be less than or equal to the bin capacity.
 
 ## Output
 
 The application displays:
 
-- Sorted list
-- Comparison count for each method
-- Execution time in milliseconds for each method
-
-Randomized Quick Sort may show a different comparison count and time each time it runs because it selects pivots randomly.
+- Lower bound for the number of bins
+- Bin contents and used capacity for each algorithm
+- Total bins used by FF, FFD, and BFD
 authour
 sravan kumar
 210425148042
