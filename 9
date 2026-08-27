@@ -1,0 +1,114 @@
+import math
+import tkinter as tk
+from tkinter import messagebox
+
+
+def first_fit(items, capacity):
+    """Pack items into the first bin with enough free space."""
+    remaining_space = []
+    bin_contents = []
+
+    for item in items:
+        for index, space in enumerate(remaining_space):
+            if space + 1e-9 >= item:
+                remaining_space[index] -= item
+                bin_contents[index].append(item)
+                break
+        else:
+            remaining_space.append(capacity - item)
+            bin_contents.append([item])
+    return bin_contents
+
+
+def first_fit_decreasing(items, capacity):
+    """Sort items in descending order, then use First Fit."""
+    return first_fit(sorted(items, reverse=True), capacity)
+
+
+def best_fit_decreasing(items, capacity):
+    """Sort items in descending order, then use Best Fit."""
+    remaining_space = []
+    bin_contents = []
+
+    for item in sorted(items, reverse=True):
+        best_index = -1
+        smallest_remaining = float("inf")
+        for index, space in enumerate(remaining_space):
+            if space + 1e-9 >= item and space - item < smallest_remaining:
+                smallest_remaining = space - item
+                best_index = index
+
+        if best_index == -1:
+            remaining_space.append(capacity - item)
+            bin_contents.append([item])
+        else:
+            remaining_space[best_index] -= item
+            bin_contents[best_index].append(item)
+    return bin_contents
+
+
+def format_bins(name, bins, capacity):
+    lines = [f"{name}: {len(bins)} bin(s)"]
+    for index, items in enumerate(bins, 1):
+        used = sum(items)
+        items_text = ", ".join(f"{item:g}" for item in items)
+        lines.append(f"  Bin {index}: [{items_text}]   Used: {used:g}/{capacity:g}")
+    return "\n".join(lines)
+
+
+def pack_items():
+    try:
+        items = [float(value.strip()) for value in items_entry.get().split(",")]
+        capacity = float(capacity_entry.get())
+        if not items or capacity <= 0 or any(item <= 0 or item > capacity for item in items):
+            raise ValueError
+    except ValueError:
+        messagebox.showerror(
+            "Invalid input",
+            "Enter positive item sizes separated by commas.\nEach item must be less than or equal to the bin capacity.",
+        )
+        return
+
+    first_fit_bins = first_fit(items, capacity)
+    first_fit_decreasing_bins = first_fit_decreasing(items, capacity)
+    best_fit_decreasing_bins = best_fit_decreasing(items, capacity)
+    lower_bound = math.ceil(sum(items) / capacity)
+
+    result_text.config(state="normal")
+    result_text.delete("1.0", tk.END)
+    result_text.insert(
+        tk.END,
+        f"Items: {', '.join(f'{item:g}' for item in items)}\n"
+        f"Bin capacity: {capacity:g}\n"
+        f"Lower bound: {lower_bound} bin(s)\n\n"
+        f"{format_bins('First Fit', first_fit_bins, capacity)}\n\n"
+        f"{format_bins('First Fit Decreasing', first_fit_decreasing_bins, capacity)}\n\n"
+        f"{format_bins('Best Fit Decreasing', best_fit_decreasing_bins, capacity)}",
+    )
+    result_text.config(state="disabled")
+
+
+root = tk.Tk()
+root.title("Bin Packing Algorithm Comparison")
+root.geometry("760x650")
+
+tk.Label(root, text="Bin Packing Algorithm Comparison", font=("Arial", 16, "bold")).pack(pady=(18, 12))
+
+tk.Label(root, text="Item sizes (separate with commas):").pack()
+items_entry = tk.Entry(root, width=76)
+items_entry.pack(pady=5)
+items_entry.insert(0, "0.5, 0.7, 0.3, 0.9, 0.2, 0.6, 0.8, 0.4, 0.1, 0.5")
+
+capacity_frame = tk.Frame(root)
+capacity_frame.pack(pady=5)
+tk.Label(capacity_frame, text="Bin capacity:").pack(side="left")
+capacity_entry = tk.Entry(capacity_frame, width=10)
+capacity_entry.pack(side="left", padx=6)
+capacity_entry.insert(0, "1.0")
+
+tk.Button(root, text="Compare Algorithms", command=pack_items, width=20).pack(pady=12)
+
+result_text = tk.Text(root, height=23, width=88, state="disabled", font=("Consolas", 10))
+result_text.pack(padx=15, pady=(0, 15))
+
+root.mainloop()
